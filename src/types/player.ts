@@ -50,6 +50,54 @@ export type PlayerListItem = {
   updatedAt: string
 }
 
+export type PlayerDetail = {
+  id: string
+  name: string
+  birthDate: string
+  nationality: string
+  position: ApiPlayerPosition
+  photoUrl: string
+  currentTeamId: string | null
+  currentTeamName: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type PlayerSeason = {
+  id: string
+  year: number
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type PlayerStatTeam = {
+  id: string
+  name: string
+  country: string
+  logoUrl: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type PlayerSeasonStat = {
+  id: string
+  playerId: string
+  seasonId: string
+  teamId: string
+  matchesPlayed: number
+  goals: number
+  assists: number
+  yellowCards: number
+  redCards: number
+  minutesPlayed: number
+  createdAt: string
+  updatedAt: string
+  season: PlayerSeason
+  team: PlayerStatTeam
+}
+
 export type CreatePlayerInput = {
   name: string
   birthDate: string
@@ -74,6 +122,26 @@ export type PlayerListResponse = {
   items: PlayerListItem[]
   meta: PlayerListMeta
 }
+
+export type PlayerStatsResponse = PlayerSeasonStat[]
+
+export type PlayerComparisonItem = {
+  id: string
+  name: string
+  birthDate: string
+  nationality: string
+  position: ApiPlayerPosition
+  photoUrl: string
+  currentTeamId: string | null
+  currentTeamName: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  currentTeam: PlayerStatTeam | null
+  stats: PlayerSeasonStat[]
+}
+
+export type PlayerComparisonResponse = PlayerComparisonItem[]
 
 export type PlayersQueryFilters = {
   search?: string

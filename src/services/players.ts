@@ -1,8 +1,11 @@
 import type {
   CreatePlayerInput,
+  PlayerComparisonResponse,
+  PlayerDetail,
   PlayerListItem,
   PlayerListResponse,
   PlayerOptions,
+  PlayerStatsResponse,
   PlayersQueryFilters,
   UpdatePlayerInput,
 } from '../types/player'
@@ -72,6 +75,35 @@ export async function getPlayersOptions() {
     nationalities: parseStringArray(payload.nationalities ?? payload.nacionalidades),
     positions: parseStringArray(payload.positions ?? payload.posiciones),
   } satisfies PlayerOptions
+}
+
+export async function getPlayerById(id: string) {
+  return request<PlayerDetail>(`/players/${id}`)
+}
+
+export async function getPlayerStats(id: string, seasonId?: string) {
+  const params = new URLSearchParams()
+
+  if (seasonId) {
+    params.set('seasonId', seasonId)
+  }
+
+  const query = params.toString()
+  return request<PlayerStatsResponse>(query ? `/players/${id}/stats?${query}` : `/players/${id}/stats`)
+}
+
+export async function getPlayersCompare(ids: string[]) {
+  const normalizedIds = Array.from(new Set(ids.map((id) => id.trim()).filter(Boolean))).slice(0, 3)
+
+  if (normalizedIds.length < 2) {
+    throw new Error('Selecciona al menos 2 jugadores para comparar')
+  }
+
+  const params = new URLSearchParams({
+    ids: normalizedIds.join(','),
+  })
+
+  return request<PlayerComparisonResponse>(`/players/compare?${params.toString()}`)
 }
 
 export async function createPlayer(input: CreatePlayerInput) {

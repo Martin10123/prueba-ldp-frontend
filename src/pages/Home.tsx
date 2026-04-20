@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FilterX, Loader2, Plus, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthSession } from '../hooks/useAuth'
 import type { ApiPlayerPosition, CreatePlayerInput, PlayerListItem, UpdatePlayerInput } from '../types/player'
 import { PlayerCard } from '../components/players/PlayerCard'
@@ -15,6 +16,7 @@ const panelClass = 'min-w-0 rounded-2xl border border-white/10 bg-[#171717] p-4 
 
 export const Home = () => {
   const { token } = useAuthSession()
+  const navigate = useNavigate()
   const {
     search,
     setSearch,
@@ -58,6 +60,10 @@ export const Home = () => {
     setFormMode('edit')
     setSelectedPlayer(player)
     setFormOpen(true)
+  }
+
+  const openPlayerProfile = (player: PlayerListItem) => {
+    navigate(`/players/${player.id}`)
   }
 
   const handleFormSubmit = async (input: CreatePlayerInput | UpdatePlayerInput) => {
@@ -280,6 +286,7 @@ export const Home = () => {
                 <PlayerCard
                   key={player.id}
                   player={player}
+                  onOpenProfile={openPlayerProfile}
                   onEdit={openEditModal}
                   onDelete={(targetPlayer) => setPlayerToDelete(targetPlayer)}
                 />

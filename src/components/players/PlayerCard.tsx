@@ -19,11 +19,12 @@ const formatDate = (value: string) =>
 
 type PlayerCardProps = {
   player: PlayerListItem
+  onOpenProfile: (player: PlayerListItem) => void
   onEdit: (player: PlayerListItem) => void
   onDelete: (player: PlayerListItem) => void
 }
 
-export const PlayerCard = ({ player, onEdit, onDelete }: PlayerCardProps) => {
+export const PlayerCard = ({ player, onOpenProfile, onEdit, onDelete }: PlayerCardProps) => {
   const age = getAge(player.birthDate)
   const positionLabel = getPositionLabel(player.position)
   const initials = player.name
@@ -34,7 +35,18 @@ export const PlayerCard = ({ player, onEdit, onDelete }: PlayerCardProps) => {
     .join('')
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition hover:border-white/20 hover:bg-[#141414]">
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpenProfile(player)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onOpenProfile(player)
+        }
+      }}
+      className="group overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition hover:cursor-pointer hover:border-white/20 hover:bg-[#141414]"
+    >
       <div className="grid gap-4 p-4 sm:grid-cols-[112px_1fr]">
         <div className="relative h-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-28">
           {player.photoUrl ? (
@@ -72,7 +84,10 @@ export const PlayerCard = ({ player, onEdit, onDelete }: PlayerCardProps) => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => onEdit(player)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onEdit(player)
+                }}
                 className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white/80 transition hover:border-white/20 hover:bg-white/10"
               >
                 <Pencil size={14} />
@@ -80,7 +95,10 @@ export const PlayerCard = ({ player, onEdit, onDelete }: PlayerCardProps) => {
               </button>
               <button
                 type="button"
-                onClick={() => onDelete(player)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onDelete(player)
+                }}
                 className="inline-flex items-center gap-1 rounded-lg border border-red-400/20 bg-red-500/10 px-2.5 py-1.5 text-xs text-red-100 transition hover:bg-red-500/20"
               >
                 <Trash2 size={14} />

@@ -5,6 +5,7 @@ import { Auth } from './pages/Auth'
 import { AppLayout } from './components/AppLayout'
 import { Home } from './pages/Home'
 import { Compare } from './pages/Compare'
+import { PlayerProfile } from './pages/PlayerProfile'
 import { NotFound } from './pages/NotFound'
 
 const LoadingSession = () => (
@@ -66,6 +67,7 @@ function App() {
         >
           <Route index element={<Navigate replace to="players" />} />
           <Route path="players" element={<Home />} />
+          <Route path="players/:playerId" element={<PlayerProfile />} />
           <Route path="compare" element={<Compare />} />
           <Route path="*" element={<NotFound />} />
         </Route>
