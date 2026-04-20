@@ -1,4 +1,10 @@
-import type { PlayerListResponse, PlayersQueryFilters } from '../types/player'
+import type {
+  CreatePlayerInput,
+  PlayerListItem,
+  PlayerListResponse,
+  PlayersQueryFilters,
+  UpdatePlayerInput,
+} from '../types/player'
 import { request } from './http'
 
 const toQueryValue = (value: string | number | undefined) => {
@@ -30,4 +36,24 @@ export async function getPlayers(filters: PlayersQueryFilters = {}) {
   const query = params.toString()
 
   return request<PlayerListResponse>(query ? `/players?${query}` : '/players')
+}
+
+export async function createPlayer(input: CreatePlayerInput) {
+  return request<PlayerListItem>('/players', {
+    method: 'POST',
+    body: input,
+  })
+}
+
+export async function updatePlayer(id: string, input: UpdatePlayerInput) {
+  return request<PlayerListItem>(`/players/${id}`, {
+    method: 'PATCH',
+    body: input,
+  })
+}
+
+export async function deletePlayer(id: string) {
+  return request<unknown>(`/players/${id}`, {
+    method: 'DELETE',
+  })
 }

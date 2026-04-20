@@ -1,163 +1,89 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { FilterX, Loader2, Search, UserRound } from 'lucide-react'
+import { useState } from 'react'
+import { FilterX, Loader2, Plus, Search } from 'lucide-react'
 import { useAuthSession } from '../hooks/useAuth'
-import { getPlayers } from '../services/players'
-import type { ApiPlayerPosition, PlayerListItem, PlayersQueryFilters } from '../types/player'
+import type { ApiPlayerPosition, CreatePlayerInput, PlayerListItem } from '../types/player'
+import { PlayerCard } from '../components/players/PlayerCard'
+import { DeletePlayerDialog } from '../components/players/DeletePlayerDialog'
+import { PlayerFormModal } from '../components/players/PlayerFormModal'
+import { usePlayersFilters, playersLimitOptions } from '../hooks/usePlayersFilters'
+import { usePlayerCrud } from '../hooks/usePlayerCrud'
+import { usePlayersQuery } from '../hooks/usePlayersQuery'
+import { POSITION_OPTIONS } from '../utils/playerPosition'
 
 const panelClass = 'min-w-0 rounded-2xl border border-white/10 bg-[#171717] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)]'
 
-const POSITION_OPTIONS: Array<{ value: ApiPlayerPosition; label: string }> = [
-  { value: 'GK', label: 'GK - Arquero' },
-  { value: 'CB', label: 'CB - Central' },
-  { value: 'RB', label: 'RB - Lateral derecho' },
-  { value: 'LB', label: 'LB - Lateral izquierdo' },
-  { value: 'CDM', label: 'CDM - Mediocentro defensivo' },
-  { value: 'CM', label: 'CM - Mediocentro' },
-  { value: 'CAM', label: 'CAM - Mediocentro ofensivo' },
-  { value: 'RW', label: 'RW - Extremo derecho' },
-  { value: 'LW', label: 'LW - Extremo izquierdo' },
-  { value: 'ST', label: 'ST - Delantero' },
-]
-
-const POSITION_LABEL_BY_CODE: Record<ApiPlayerPosition, string> = {
-  GK: 'Arquero',
-  CB: 'Defensor central',
-  RB: 'Lateral derecho',
-  LB: 'Lateral izquierdo',
-  CDM: 'Mediocentro defensivo',
-  CM: 'Mediocentro',
-  CAM: 'Mediocentro ofensivo',
-  RW: 'Extremo derecho',
-  LW: 'Extremo izquierdo',
-  ST: 'Delantero',
-}
-
-const LIMIT_OPTIONS = [10, 20, 50] as const
-
-const getAge = (birthDate: string) => {
-  const birth = new Date(birthDate)
-  if (Number.isNaN(birth.getTime())) return null
-
-  const ageDate = new Date(Date.now() - birth.getTime())
-  return Math.abs(ageDate.getUTCFullYear() - 1970)
-}
-
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat('es-CO', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value))
-
-const parseNumberInput = (value: string) => {
-  if (value.trim() === '') return undefined
-
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-const PlayerCard = ({ player }: { player: PlayerListItem }) => {
-  const age = getAge(player.birthDate)
-  const positionLabel = POSITION_LABEL_BY_CODE[player.position] ?? player.position
-  const initials = player.name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
-
-  return (
-    <article className="overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition hover:border-white/20 hover:bg-[#141414]">
-      <div className="grid gap-4 p-4 sm:grid-cols-[112px_1fr]">
-        <div className="relative h-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-28">
-          {player.photoUrl ? (
-            <img alt={player.name} src={player.photoUrl} className="h-full w-full object-cover" />
-          ) : (
-            <div className="grid h-full w-full place-items-center bg-linear-to-br from-[#00E094]/20 to-[#0C65D4]/20 text-2xl font-black text-white/80">
-              {initials || <UserRound size={28} />}
-            </div>
-          )}
-        </div>
-
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="truncate text-lg font-bold">{player.name}</h3>
-              <p className="mt-1 text-sm text-white/60">{positionLabel}</p>
-            </div>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80">
-              {player.position}
-            </span>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/70">
-            <span className="rounded-full bg-white/10 px-2 py-1">{player.nationality || 'Sin nacionalidad'}</span>
-            <span className="rounded-full bg-white/10 px-2 py-1">{age ? `${age} años` : 'Edad no disponible'}</span>
-            <span className="rounded-full bg-white/10 px-2 py-1">Club: {player.currentTeamName}</span>
-          </div>
-
-          <div className="mt-4 grid gap-2 text-sm text-white/65">
-            <p>
-              <span className="text-white/45">Nacimiento: </span>
-              {formatDate(player.birthDate)}
-            </p>
-          </div>
-        </div>
-      </div>
-    </article>
-  )
-}
-
 export const Home = () => {
   const { token } = useAuthSession()
-  const [search, setSearch] = useState('')
-  const [position, setPosition] = useState<ApiPlayerPosition | 'ALL'>('ALL')
-  const [nationality, setNationality] = useState('')
-  const [minAge, setMinAge] = useState('')
-  const [maxAge, setMaxAge] = useState('')
-  const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState<(typeof LIMIT_OPTIONS)[number]>(10)
+  const {
+    search,
+    setSearch,
+    position,
+    setPosition,
+    nationality,
+    setNationality,
+    minAge,
+    setMinAge,
+    maxAge,
+    setMaxAge,
+    page,
+    setPage,
+    limit,
+    setLimit,
+    filters,
+    clearFilters,
+  } = usePlayersFilters()
 
-  const deferredSearch = useDeferredValue(search.trim())
-
-  useEffect(() => {
-    setPage(1)
-  }, [deferredSearch, position, nationality, minAge, maxAge, limit])
-
-  const filters = useMemo<PlayersQueryFilters>(
-    () => ({
-      search: deferredSearch || undefined,
-      position: position === 'ALL' ? undefined : position,
-      nationality: nationality.trim() || undefined,
-      minAge: parseNumberInput(minAge),
-      maxAge: parseNumberInput(maxAge),
-      page,
-      limit,
-    }),
-    [deferredSearch, limit, maxAge, minAge, nationality, page, position],
-  )
-
-  const playersQuery = useQuery({
-    queryKey: ['players', token, filters],
-    queryFn: () => getPlayers(filters),
-    placeholderData: keepPreviousData,
-    enabled: Boolean(token),
-  })
+  const playersQuery = usePlayersQuery(filters, Boolean(token))
+  const { onCreatePlayer, onUpdatePlayer, onDeletePlayer } = usePlayerCrud()
+  const [formOpen, setFormOpen] = useState(false)
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerListItem | null>(null)
+  const [playerToDelete, setPlayerToDelete] = useState<PlayerListItem | null>(null)
 
   const players = playersQuery.data?.items ?? []
   const meta = playersQuery.data?.meta
   const totalPages = meta?.totalPages ?? 0
   const isInitialLoading = playersQuery.isLoading && !playersQuery.data
 
-  const clearFilters = () => {
-    setSearch('')
-    setPosition('ALL')
-    setNationality('')
-    setMinAge('')
-    setMaxAge('')
-    setPage(1)
-    setLimit(10)
+  const openCreateModal = () => {
+    setFormMode('create')
+    setSelectedPlayer(null)
+    setFormOpen(true)
+  }
+
+  const openEditModal = (player: PlayerListItem) => {
+    setFormMode('edit')
+    setSelectedPlayer(player)
+    setFormOpen(true)
+  }
+
+  const handleFormSubmit = async (input: CreatePlayerInput) => {
+    try {
+      if (formMode === 'create') {
+        await onCreatePlayer.mutateAsync(input)
+      } else if (selectedPlayer) {
+        await onUpdatePlayer.mutateAsync({
+          id: selectedPlayer.id,
+          input,
+        })
+      }
+
+      setFormOpen(false)
+      setSelectedPlayer(null)
+    } catch (error) {
+      console.error('Error guardando jugador:', error)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!playerToDelete) return
+
+    try {
+      await onDeletePlayer.mutateAsync(playerToDelete.id)
+      setPlayerToDelete(null)
+    } catch (error) {
+      console.error('Error eliminando jugador:', error)
+    }
   }
 
   return (
@@ -196,14 +122,24 @@ export const Home = () => {
             <p className="text-sm text-white/55">El cambio de filtros resetea la paginación y reutiliza el cache de React Query.</p>
           </div>
 
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 transition hover:border-white/20 hover:bg-white/10"
-          >
-            <FilterX size={16} />
-            Limpiar
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 transition hover:border-white/20 hover:bg-white/10"
+            >
+              <FilterX size={16} />
+              Limpiar
+            </button>
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#00E094] px-3 py-2 text-sm font-semibold text-black transition hover:brightness-110"
+            >
+              <Plus size={16} />
+              Crear jugador
+            </button>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-[1.4fr_repeat(5,minmax(0,1fr))]">
@@ -278,10 +214,10 @@ export const Home = () => {
             <span className="mb-2 block text-xs uppercase tracking-[0.2em] text-white/45">Por página</span>
             <select
               value={limit}
-              onChange={(event) => setLimit(Number(event.target.value) as (typeof LIMIT_OPTIONS)[number])}
+              onChange={(event) => setLimit(Number(event.target.value) as (typeof playersLimitOptions)[number])}
               className="w-full rounded-xl border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#00E094]/40"
             >
-              {LIMIT_OPTIONS.map((item) => (
+              {playersLimitOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -333,7 +269,12 @@ export const Home = () => {
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {players.map((player) => (
-                <PlayerCard key={player.id} player={player} />
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  onEdit={openEditModal}
+                  onDelete={(targetPlayer) => setPlayerToDelete(targetPlayer)}
+                />
               ))}
             </div>
           )}
@@ -368,6 +309,26 @@ export const Home = () => {
           </div>
         </div>
       </section>
+
+      <PlayerFormModal
+        open={formOpen}
+        mode={formMode}
+        player={selectedPlayer}
+        isSubmitting={onCreatePlayer.isPending || onUpdatePlayer.isPending}
+        onClose={() => {
+          setFormOpen(false)
+          setSelectedPlayer(null)
+        }}
+        onSubmit={handleFormSubmit}
+      />
+
+      <DeletePlayerDialog
+        open={Boolean(playerToDelete)}
+        playerName={playerToDelete?.name ?? ''}
+        loading={onDeletePlayer.isPending}
+        onClose={() => setPlayerToDelete(null)}
+        onConfirm={handleDelete}
+      />
     </section>
   )
 }

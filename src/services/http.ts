@@ -28,18 +28,27 @@ export async function request<T>(path: string, options: RequestOptions = {}) {
     body: options.body ? JSON.stringify(options.body) : undefined,
   })
 
+  if (response.status === 204) {
+    return undefined as T
+  }
+
   let payload: ApiResponse<T> | null = null
 
   try {
-    payload = (await response.json()) as ApiResponse<T>
+    const rawPayload = await response.text()
+    if (rawPayload.trim().length > 0) {
+      payload = JSON.parse(rawPayload) as ApiResponse<T>
+    }
   } catch {
     throw new Error('Respuesta invalida del servidor')
   }
 
-  if (!response.ok || isApiError(payload)) {
-    const message = isApiError(payload) ? payload.message : 'No se pudo completar la solicitud'
+  if (!response.ok || (payload !== null && isApiError(payload))) {
+    const message = payload !== null && isApiError(payload)
+      ? payload.message
+      : 'No se pudo completar la solicitud'
     throw new Error(message)
   }
 
-  return payload.data
+  return payload ? payload.data : (undefined as T)
 }

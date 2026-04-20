@@ -34,10 +34,21 @@ export type PlayerListItem = {
   position: ApiPlayerPosition
   photoUrl: string
   currentTeamId: string
-  currentTeamName: string
+  currentTeamName?: string
   createdAt: string
   updatedAt: string
 }
+
+export type CreatePlayerInput = {
+  name: string
+  birthDate: string
+  nationality: string
+  position: ApiPlayerPosition
+  photoUrl: string
+  currentTeamId: string
+}
+
+export type UpdatePlayerInput = Partial<CreatePlayerInput>
 
 export type PlayerListMeta = {
   page: number
