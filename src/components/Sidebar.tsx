@@ -14,8 +14,7 @@ export const Sidebar = () => {
       </div>
       <nav className="flex flex-col items-center gap-2">
         <NavLink
-          to="/"
-          end
+          to="/players"
           className={({ isActive }) =>
             `grid h-10 w-10 place-items-center rounded-xl border transition ${
               isActive
@@ -23,7 +22,7 @@ export const Sidebar = () => {
                 : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20 hover:bg-white/10 hover:text-white'
             }`
           }
-          aria-label="Inicio"
+          aria-label="Jugadores"
         >
           <House size={18} />
         </NavLink>

@@ -1,4 +1,5 @@
 import type { ApiResponse } from '../types/api'
+import { useAuthStore } from '../store/auth'
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
@@ -12,12 +13,13 @@ const isApiError = <T>(payload: ApiResponse<T>): payload is Extract<ApiResponse<
   payload.success === false
 
 export async function request<T>(path: string, options: RequestOptions = {}) {
+  const authToken = options.token ?? useAuthStore.getState().token
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
 
-  if (options.token) {
-    headers.Authorization = `Bearer ${options.token}`
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`
   }
 
   const response = await fetch(`${API_URL}${path}`, {

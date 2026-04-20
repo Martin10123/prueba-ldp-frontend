@@ -64,7 +64,8 @@ function App() {
             </RequireAuth>
           }
         >
-          <Route index element={<Home />} />
+          <Route index element={<Navigate replace to="players" />} />
+          <Route path="players" element={<Home />} />
           <Route path="compare" element={<Compare />} />
           <Route path="*" element={<NotFound />} />
         </Route>

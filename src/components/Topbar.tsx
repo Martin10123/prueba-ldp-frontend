@@ -32,11 +32,10 @@ export const Topbar = () => {
           className={({ isActive }) =>
             `${baseLink} ${isActive ? 'border-[#00E094]/30 bg-[#00E094]/15 text-white' : 'border-white/10 text-white/80'}`
           }
-          to="/"
-          end
+          to="/players"
         >
           <House size={16} />
-          Inicio
+          Jugadores
         </NavLink>
         <NavLink
           className={({ isActive }) =>
