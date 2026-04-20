@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Eye, EyeOff, ShieldCheck, UserRound } from 'lucide-react'
+import { Eye, EyeOff, UserRound } from 'lucide-react'
 import { useAuthStore } from '../store/auth'
 import type { AuthCredentials, AuthRegisterInput } from '../types/auth'
 
@@ -29,34 +29,16 @@ export const Auth = () => {
   })
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] px-4 py-6 text-[#f2f2f2]">
-      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.5)] lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="grid min-h-screen place-items-center bg-[#0f0f0f] px-4 py-6 text-[#f2f2f2]">
+      <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.5)] lg:grid-cols-[1.1fr_0.9fr]">
         <section className="relative flex flex-col justify-between border-b border-white/10 bg-[radial-gradient(circle_at_top,rgba(0,224,148,0.18),transparent_34%),linear-gradient(180deg,#141414_0%,#0f0f0f_100%)] p-8 lg:border-b-0 lg:border-r lg:border-white/10 lg:p-10">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#00E094]/20 bg-[#00E094]/10 px-3 py-1 text-xs font-semibold text-[#00E094]">
-              <ShieldCheck size={14} />
-              Autenticación básica JWT
-            </div>
             <h1 className="mt-5 max-w-lg text-4xl font-extrabold leading-tight md:text-5xl">
-              Scout Panel con autenticación básica y sesión persistida.
+              Scout Panel
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-6 text-white/65 md:text-base">
-              Un acceso simple con inicio de sesión / registro, token JWT demo guardado en localStorage y salida.
-              Ideal para probar el flujo sin complicar la prueba técnica.
+              Ingresa para encontrar toda la información acerca de los jugadores, sus estadísticas y más.
             </p>
-          </div>
-
-          <div className="mt-10 grid gap-3 sm:grid-cols-3">
-            {[
-              ['JWT', 'Token persistido'],
-              ['Seguro', 'Sesión básica'],
-              ['Rápido', 'Sin backend real'],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-semibold text-[#00E094]">{title}</p>
-                <p className="mt-1 text-sm text-white/65">{text}</p>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -172,10 +154,6 @@ export const Auth = () => {
                 </button>
               </form>
             )}
-
-            <p className="mt-4 text-center text-xs text-white/45">
-              Demostración de autenticación JWT. Puedes entrar con cualquier correo y contraseña.
-            </p>
           </div>
         </section>
       </div>
