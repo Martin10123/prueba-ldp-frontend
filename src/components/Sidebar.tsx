@@ -7,8 +7,10 @@ export const Sidebar = () => {
       className="sticky top-0 hidden min-h-screen w-18 shrink-0 border-r border-white/10 bg-black/30 px-2 py-3 md:block"
       aria-label="Navegación lateral"
     >
-      <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-[#00E094]/20 font-extrabold text-[#00E094]">
-        SS
+      <div className="flex flex-col items-center gap-2">
+        <div className="mb-4 grid h-10 w-10 place-items-center">
+          <img src="/logo.avif" alt="" />
+        </div>
       </div>
       <nav className="flex flex-col items-center gap-2">
         <NavLink

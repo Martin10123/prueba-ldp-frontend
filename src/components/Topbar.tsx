@@ -1,13 +1,13 @@
 import { BarChart3, House, LogOut, UserRound } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/auth'
+import { useAuthActions, useAuthSession } from '../hooks/useAuth'
 
 const baseLink =
   'inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition hover:border-white/20 hover:bg-white/5'
 
 export const Topbar = () => {
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
+  const { user } = useAuthSession()
+  const { logout } = useAuthActions()
   const navigate = useNavigate()
 
   return (
@@ -16,7 +16,7 @@ export const Topbar = () => {
         <img
           src="/logo.avif"
           alt="LDP"
-          className="h-7 w-auto rounded-md border border-white/10 bg-white/5 p-1"
+          className="h-7 w-auto rounded-md border border-white/10 bg-white/5 p-1 md:hidden"
         />
         <span className="text-sm text-white/90">Panel Scout</span>
         {user ? (

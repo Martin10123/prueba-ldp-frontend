@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { useAuthStore } from './store/auth'
+import { useAuthSession } from './hooks/useAuth'
 import { Auth } from './pages/Auth'
 import { AppLayout } from './components/AppLayout'
 import { Home } from './pages/Home'
@@ -16,8 +16,7 @@ const LoadingSession = () => (
 )
 
 const RequireAuth = ({ children }: { children: ReactNode }) => {
-  const hydrated = useAuthStore((state) => state.hydrated)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated())
+  const { hydrated, isAuthenticated } = useAuthSession()
 
   if (!hydrated) {
     return <LoadingSession />
@@ -31,8 +30,7 @@ const RequireAuth = ({ children }: { children: ReactNode }) => {
 }
 
 const GuestOnly = ({ children }: { children: ReactNode }) => {
-  const hydrated = useAuthStore((state) => state.hydrated)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated())
+  const { hydrated, isAuthenticated } = useAuthSession()
 
   if (!hydrated) {
     return <LoadingSession />

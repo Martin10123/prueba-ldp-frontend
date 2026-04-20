@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, UserRound } from 'lucide-react'
-import { useAuthStore } from '../store/auth'
+import { useNavigate } from 'react-router-dom'
+import { sileo } from 'sileo'
+import { useAuthActions, useAuthSession } from '../hooks/useAuth'
 import type { AuthCredentials, AuthRegisterInput } from '../types/auth'
 
 type Mode = 'login' | 'register'
@@ -9,8 +11,9 @@ type Mode = 'login' | 'register'
 export const Auth = () => {
   const [mode, setMode] = useState<Mode>('login')
   const [showPassword, setShowPassword] = useState(false)
-  const login = useAuthStore((state) => state.login)
-  const register = useAuthStore((state) => state.register)
+  const { login, register, clearError } = useAuthActions()
+  const { loading, error } = useAuthSession()
+  const navigate = useNavigate()
 
   const loginForm = useForm<AuthCredentials>({
     defaultValues: { email: 'scout@ldp.com', password: 'secret123' },
@@ -20,12 +23,38 @@ export const Auth = () => {
     defaultValues: { name: 'Scout Pro', email: 'scout@ldp.com', password: 'secret123' },
   })
 
-  const loginSubmit = loginForm.handleSubmit((values) => {
-    login(values)
+  const loginSubmit = loginForm.handleSubmit(async (values) => {
+    try {
+      await login(values)
+      sileo.success({
+        title: 'Sesion iniciada',
+        description: 'Bienvenido al panel',
+      })
+      navigate('/', { replace: true })
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : 'No se pudo iniciar sesion'
+      sileo.error({
+        title: 'Error al iniciar sesion',
+        description: message,
+      })
+    }
   })
 
-  const registerSubmit = registerForm.handleSubmit((values) => {
-    register(values)
+  const registerSubmit = registerForm.handleSubmit(async (values) => {
+    try {
+      await register(values)
+      sileo.success({
+        title: 'Cuenta creada',
+        description: 'Tu registro fue exitoso',
+      })
+      navigate('/', { replace: true })
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : 'No se pudo crear la cuenta'
+      sileo.error({
+        title: 'Error al registrar cuenta',
+        description: message,
+      })
+    }
   })
 
   return (
@@ -47,7 +76,10 @@ export const Auth = () => {
             <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl bg-black/30 p-1">
               <button
                 type="button"
-                onClick={() => setMode('login')}
+                onClick={() => {
+                  clearError()
+                  setMode('login')
+                }}
                 className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
                   mode === 'login' ? 'bg-[#00E094] text-black' : 'text-white/70 hover:bg-white/5'
                 }`}
@@ -56,7 +88,10 @@ export const Auth = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setMode('register')}
+                onClick={() => {
+                  clearError()
+                  setMode('register')
+                }}
                 className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
                   mode === 'register' ? 'bg-[#00E094] text-black' : 'text-white/70 hover:bg-white/5'
                 }`}
@@ -75,6 +110,7 @@ export const Auth = () => {
                     id="login-email"
                     type="email"
                     className="w-full rounded-xl border border-white/10 bg-[#111111] px-4 py-3 text-sm outline-none focus:border-[#00E094]/40"
+                    autoComplete="email"
                     {...loginForm.register('email', { required: true })}
                   />
                 </div>
@@ -88,7 +124,8 @@ export const Auth = () => {
                       id="login-password"
                       type={showPassword ? 'text' : 'password'}
                       className="w-full rounded-xl border border-white/10 bg-[#111111] px-4 py-3 pr-12 text-sm outline-none focus:border-[#00E094]/40"
-                      {...loginForm.register('password', { required: true })}
+                      autoComplete="current-password"
+                      {...loginForm.register('password', { required: true, minLength: 6 })}
                     />
                     <button
                       type="button"
@@ -102,10 +139,11 @@ export const Auth = () => {
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00E094] px-4 py-3 text-sm font-bold text-black transition hover:brightness-110"
                 >
                   <UserRound size={16} />
-                  Entrar al panel
+                  {loading ? 'Ingresando...' : 'Entrar al panel'}
                 </button>
               </form>
             ) : (
@@ -117,7 +155,8 @@ export const Auth = () => {
                   <input
                     id="register-name"
                     className="w-full rounded-xl border border-white/10 bg-[#111111] px-4 py-3 text-sm outline-none focus:border-[#00E094]/40"
-                    {...registerForm.register('name', { required: true })}
+                    autoComplete="name"
+                    {...registerForm.register('name', { required: true, minLength: 2 })}
                   />
                 </div>
 
@@ -129,6 +168,7 @@ export const Auth = () => {
                     id="register-email"
                     type="email"
                     className="w-full rounded-xl border border-white/10 bg-[#111111] px-4 py-3 text-sm outline-none focus:border-[#00E094]/40"
+                    autoComplete="email"
                     {...registerForm.register('email', { required: true })}
                   />
                 </div>
@@ -141,19 +181,31 @@ export const Auth = () => {
                     id="register-password"
                     type={showPassword ? 'text' : 'password'}
                     className="w-full rounded-xl border border-white/10 bg-[#111111] px-4 py-3 text-sm outline-none focus:border-[#00E094]/40"
-                    {...registerForm.register('password', { required: true })}
+                    autoComplete="new-password"
+                    {...registerForm.register('password', { required: true, minLength: 6 })}
                   />
                 </div>
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00E094] px-4 py-3 text-sm font-bold text-black transition hover:brightness-110"
                 >
                   <UserRound size={16} />
-                  Crear cuenta
+                  {loading ? 'Creando cuenta...' : 'Crear cuenta'}
                 </button>
               </form>
             )}
+
+            {error ? (
+              <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+                {error}
+              </p>
+            ) : null}
+
+            <p className="mt-4 text-center text-xs text-white/45">
+              Usa una cuenta valida registrada en el backend para iniciar sesion.
+            </p>
           </div>
         </section>
       </div>

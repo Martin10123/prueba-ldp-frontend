@@ -12,7 +12,7 @@ import {
 import { ageRanges, filtersSummary, getAgeRange, nationalities, players, positions, summaryStats } from '../data/scoutData'
 import type { Position } from '../types/player'
 
-const panelClass = 'rounded-2xl border border-white/10 bg-[#171717] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)]'
+const panelClass = 'min-w-0 rounded-2xl border border-white/10 bg-[#171717] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)]'
 
 export const Home = () => {
   const [query, setQuery] = useState('')
@@ -178,8 +178,8 @@ export const Home = () => {
               <span className="font-semibold">2026</span>
               <span className="text-white/60">Liga Profesional de Fútbol</span>
             </div>
-            <div className="mt-2 h-50 w-full">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="mt-2 h-55 w-full min-w-0">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart
                   data={[
                     { name: 'G', value: activePlayer.stats.goals },
