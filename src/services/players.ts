@@ -2,6 +2,7 @@ import type {
   CreatePlayerInput,
   PlayerListItem,
   PlayerListResponse,
+  PlayerOptions,
   PlayersQueryFilters,
   UpdatePlayerInput,
 } from '../types/player'
@@ -12,6 +13,31 @@ const toQueryValue = (value: string | number | undefined) => {
   if (typeof value === 'string' && value.trim() === '') return undefined
 
   return String(value)
+}
+
+const parseStringArray = (value: unknown) =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+
+const parseTeams = (value: unknown) => {
+  if (!Array.isArray(value)) return []
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null
+
+      const id = 'id' in item && (typeof item.id === 'string' || typeof item.id === 'number')
+        ? String(item.id)
+        : null
+      const name = 'name' in item && typeof item.name === 'string'
+        ? item.name
+        : 'nombre' in item && typeof item.nombre === 'string'
+          ? item.nombre
+          : null
+
+      if (!id || !name) return null
+      return { id, name }
+    })
+    .filter((item): item is { id: string; name: string } => item !== null)
 }
 
 export async function getPlayers(filters: PlayersQueryFilters = {}) {
@@ -36,6 +62,16 @@ export async function getPlayers(filters: PlayersQueryFilters = {}) {
   const query = params.toString()
 
   return request<PlayerListResponse>(query ? `/players?${query}` : '/players')
+}
+
+export async function getPlayersOptions() {
+  const payload = await request<Record<string, unknown>>('/players/options')
+
+  return {
+    teams: parseTeams(payload.teams ?? payload.equipos),
+    nationalities: parseStringArray(payload.nationalities ?? payload.nacionalidades),
+    positions: parseStringArray(payload.positions ?? payload.posiciones),
+  } satisfies PlayerOptions
 }
 
 export async function createPlayer(input: CreatePlayerInput) {

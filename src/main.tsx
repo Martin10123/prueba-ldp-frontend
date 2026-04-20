@@ -19,7 +19,16 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" options={{
+        fill: "#171717",
+        roundness: 16,
+        styles: {
+          title: "text-white!",
+          description: "text-white/75!",
+          badge: "bg-white/10!",
+          button: "bg-white/10! hover:bg-white/15!",
+        },
+      }} />
       <App />
     </QueryClientProvider>
   </StrictMode>,

@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { FilterX, Loader2, Plus, Search } from 'lucide-react'
 import { useAuthSession } from '../hooks/useAuth'
-import type { ApiPlayerPosition, CreatePlayerInput, PlayerListItem } from '../types/player'
+import type { ApiPlayerPosition, CreatePlayerInput, PlayerListItem, UpdatePlayerInput } from '../types/player'
 import { PlayerCard } from '../components/players/PlayerCard'
 import { DeletePlayerDialog } from '../components/players/DeletePlayerDialog'
 import { PlayerFormModal } from '../components/players/PlayerFormModal'
 import { usePlayersFilters, playersLimitOptions } from '../hooks/usePlayersFilters'
 import { usePlayerCrud } from '../hooks/usePlayerCrud'
 import { usePlayersQuery } from '../hooks/usePlayersQuery'
-import { POSITION_OPTIONS } from '../utils/playerPosition'
+import { usePlayersOptionsQuery } from '../hooks/usePlayersOptionsQuery'
+import { getPositionLabel } from '../utils/playerPosition'
 
 const panelClass = 'min-w-0 rounded-2xl border border-white/10 bg-[#171717] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)]'
 
@@ -34,6 +35,7 @@ export const Home = () => {
   } = usePlayersFilters()
 
   const playersQuery = usePlayersQuery(filters, Boolean(token))
+  const optionsQuery = usePlayersOptionsQuery(Boolean(token))
   const { onCreatePlayer, onUpdatePlayer, onDeletePlayer } = usePlayerCrud()
   const [formOpen, setFormOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
@@ -41,6 +43,7 @@ export const Home = () => {
   const [playerToDelete, setPlayerToDelete] = useState<PlayerListItem | null>(null)
 
   const players = playersQuery.data?.items ?? []
+  const playersOptions = optionsQuery.data ?? { teams: [], nationalities: [], positions: [] }
   const meta = playersQuery.data?.meta
   const totalPages = meta?.totalPages ?? 0
   const isInitialLoading = playersQuery.isLoading && !playersQuery.data
@@ -57,14 +60,14 @@ export const Home = () => {
     setFormOpen(true)
   }
 
-  const handleFormSubmit = async (input: CreatePlayerInput) => {
+  const handleFormSubmit = async (input: CreatePlayerInput | UpdatePlayerInput) => {
     try {
       if (formMode === 'create') {
-        await onCreatePlayer.mutateAsync(input)
+        await onCreatePlayer.mutateAsync(input as CreatePlayerInput)
       } else if (selectedPlayer) {
         await onUpdatePlayer.mutateAsync({
           id: selectedPlayer.id,
-          input,
+          input: input as UpdatePlayerInput,
         })
       }
 
@@ -165,9 +168,9 @@ export const Home = () => {
               className="w-full rounded-xl border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#00E094]/40"
             >
               <option value="ALL">Todas</option>
-              {POSITION_OPTIONS.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
+              {playersOptions.positions.map((item) => (
+                <option key={item} value={item}>
+                  {item} - {getPositionLabel(item)}
                 </option>
               ))}
             </select>
@@ -175,13 +178,18 @@ export const Home = () => {
 
           <label className="block">
             <span className="mb-2 block text-xs uppercase tracking-[0.2em] text-white/45">Nacionalidad</span>
-            <input
-              aria-label="Filtrar por nacionalidad"
+            <select
               className="w-full rounded-xl border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#00E094]/40"
-              placeholder="Ej. Argentina"
               value={nationality}
               onChange={(event) => setNationality(event.target.value)}
-            />
+            >
+              <option value="">Todas</option>
+              {playersOptions.nationalities.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="block">
@@ -314,6 +322,8 @@ export const Home = () => {
         open={formOpen}
         mode={formMode}
         player={selectedPlayer}
+        options={playersOptions}
+        optionsLoading={optionsQuery.isLoading}
         isSubmitting={onCreatePlayer.isPending || onUpdatePlayer.isPending}
         onClose={() => {
           setFormOpen(false)

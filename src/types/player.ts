@@ -24,7 +24,18 @@ export type Player = {
   stats: PlayerStats
 }
 
-export type ApiPlayerPosition = 'GK' | 'CB' | 'RB' | 'LB' | 'CDM' | 'CM' | 'CAM' | 'RW' | 'LW' | 'ST'
+export type ApiPlayerPosition = string
+
+export type PlayerOptionTeam = {
+  id: string
+  name: string
+}
+
+export type PlayerOptions = {
+  teams: PlayerOptionTeam[]
+  nationalities: string[]
+  positions: ApiPlayerPosition[]
+}
 
 export type PlayerListItem = {
   id: string
@@ -33,8 +44,8 @@ export type PlayerListItem = {
   nationality: string
   position: ApiPlayerPosition
   photoUrl: string
-  currentTeamId: string
-  currentTeamName?: string
+  currentTeamId?: string
+  currentTeamName: string
   createdAt: string
   updatedAt: string
 }

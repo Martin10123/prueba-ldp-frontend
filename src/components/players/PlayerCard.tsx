@@ -60,7 +60,7 @@ export const PlayerCard = ({ player, onEdit, onDelete }: PlayerCardProps) => {
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/70">
             <span className="rounded-full bg-white/10 px-2 py-1">{player.nationality || 'Sin nacionalidad'}</span>
             <span className="rounded-full bg-white/10 px-2 py-1">{age ? `${age} años` : 'Edad no disponible'}</span>
-            <span className="rounded-full bg-white/10 px-2 py-1">Club: {player.currentTeamName || player.currentTeamId}</span>
+            <span className="rounded-full bg-white/10 px-2 py-1">Club: {player.currentTeamName || 'Sin equipo'}</span>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-white/65">
