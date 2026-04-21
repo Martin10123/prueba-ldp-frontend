@@ -1,69 +1,62 @@
-# React + TypeScript + Vite
+# Prueba LDP Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacion frontend para gestion y comparacion de jugadores.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19 + TypeScript
+- Vite
+- React Query
+- Zustand
+- Tailwind CSS
+- Vitest
 
-## Expanding the ESLint configuration
+## Requisitos
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js 20+
+- npm 10+
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Instalacion
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Uso rapido
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Desarrollo
+npm run dev
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build de produccion
+npm run build
+
+# Vista previa del build
+npm run preview
+
+# Lint
+npm run lint
+
+# Tests (watch)
+npm run test
+
+# Tests (una sola corrida)
+npm run test:run
+```
+
+## Estructura principal
+
+- `src/pages`: vistas principales
+- `src/components`: componentes de UI
+- `src/hooks`: logica reutilizable
+- `src/services`: llamadas HTTP y servicios
+- `src/store`: estado global
+- `src/tests`: pruebas unitarias
+
+## Nota
+
+Si en PowerShell falla la ejecucion de scripts, usa:
+
+```bash
+cmd /c npm run dev
 ```
