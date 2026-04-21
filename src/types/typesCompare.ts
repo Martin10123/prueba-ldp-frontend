@@ -13,6 +13,10 @@ export type CompareRadarDatum = {
   metric: string
 } & Record<string, number | string>
 
+export type CompareBarDatum = {
+  metric: string
+} & Record<string, number | string>
+
 export type CompareMetricCell = {
   playerId: string
   value: number

@@ -1,5 +1,6 @@
 import { Loader2, Users } from 'lucide-react'
 import { CompareMetricsTable } from '../components/compare/CompareMetricsTable'
+import { CompareBarChartCard } from '../components/compare/CompareBarChartCard'
 import { ComparePlayerHighlights } from '../components/compare/ComparePlayerHighlights'
 import { ComparePlayerSelector } from '../components/compare/ComparePlayerSelector'
 import { CompareRadarChartCard } from '../components/compare/CompareRadarChartCard'
@@ -19,7 +20,7 @@ export const Compare = () => {
     onSelectPlayer,
     onToggleThirdPlayer,
   } = useCompareSelection(Boolean(token))
-  const { compareQuery, playerStats, radarData, metricRows, isLoadingCompare } = useCompareInsights(
+  const { compareQuery, playerStats, radarData, metricRows, barData, isLoadingCompare } = useCompareInsights(
     selectedIds,
     Boolean(token),
   )
@@ -88,11 +89,18 @@ export const Compare = () => {
         <>
           <ComparePlayerHighlights players={playerStats} />
 
-          <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+          <section className="grid gap-4 xl:grid-cols-2">
             <CompareRadarChartCard
               radarData={radarData}
               players={playerStats.map((item) => item.series)}
             />
+            <CompareBarChartCard
+              barData={barData}
+              players={playerStats.map((item) => item.series)}
+            />
+          </section>
+
+          <section>
             <CompareMetricsTable
               players={playerStats.map((item) => item.series)}
               rows={metricRows}

@@ -1,4 +1,4 @@
-import type { ComparePlayerComputed } from './types'
+import type { ComparePlayerComputed } from '../../types/typesCompare'
 import { formatInteger } from '../../helpers/compare'
 
 type ComparePlayerHighlightsProps = {

@@ -14,7 +14,6 @@ import { request } from './http'
 const toQueryValue = (value: string | number | undefined) => {
   if (value === undefined) return undefined
   if (typeof value === 'string' && value.trim() === '') return undefined
-
   return String(value)
 }
 
@@ -24,23 +23,15 @@ const parseStringArray = (value: unknown) =>
 const parseTeams = (value: unknown) => {
   if (!Array.isArray(value)) return []
 
-  return value
-    .map((item) => {
-      if (!item || typeof item !== 'object') return null
+  return value.reduce<{ id: string; name: string }[]>((acc, item) => {
+    if (!item || typeof item !== 'object') return acc
 
-      const id = 'id' in item && (typeof item.id === 'string' || typeof item.id === 'number')
-        ? String(item.id)
-        : null
-      const name = 'name' in item && typeof item.name === 'string'
-        ? item.name
-        : 'nombre' in item && typeof item.nombre === 'string'
-          ? item.nombre
-          : null
+    const id = String(item.id ?? '')
+    const name = item.name ?? item.nombre ?? ''
 
-      if (!id || !name) return null
-      return { id, name }
-    })
-    .filter((item): item is { id: string; name: string } => item !== null)
+    if (id && name) acc.push({ id, name: String(name) })
+    return acc
+  }, [])
 }
 
 export async function getPlayers(filters: PlayersQueryFilters = {}) {

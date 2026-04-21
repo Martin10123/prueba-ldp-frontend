@@ -5,7 +5,7 @@ import { usePlayersCompareQuery } from './usePlayersCompareQuery'
 export const useCompareInsights = (selectedIds: string[], enabled: boolean) => {
   const compareQuery = usePlayersCompareQuery(selectedIds, enabled)
 
-  const { playerStats, radarData, metricRows } = useMemo(
+  const { playerStats, radarData, metricRows, barData } = useMemo(
     () => buildCompareViewModel(selectedIds, compareQuery.data),
     [compareQuery.data, selectedIds],
   )
@@ -17,6 +17,7 @@ export const useCompareInsights = (selectedIds: string[], enabled: boolean) => {
     playerStats,
     radarData,
     metricRows,
+    barData,
     isLoadingCompare,
   }
 }

@@ -1,4 +1,4 @@
-import type { CompareMetricRow, CompareSeriesPlayer } from './types'
+import type { CompareMetricRow, CompareSeriesPlayer } from '../../types/typesCompare'
 
 type CompareMetricsTableProps = {
   players: CompareSeriesPlayer[]

@@ -1,4 +1,4 @@
-import type { CompareMetricRow, CompareRadarDatum, ComparePlayerComputed } from '../components/compare/types'
+import type { CompareBarDatum, CompareMetricRow, CompareRadarDatum, ComparePlayerComputed } from '../types/typesCompare'
 import type { PlayerComparisonItem, PlayerListItem, PlayersQueryFilters } from '../types/player'
 import { getPositionLabel } from '../utils/playerPosition'
 
@@ -44,6 +44,13 @@ const radarMetricDefinitions: MetricDefinition[] = [
   { key: 'matchesPlayed', label: 'Partidos', toDisplay: formatInteger },
   { key: 'minutesPlayed', label: 'Minutos', toDisplay: formatInteger },
   { key: 'cardsPer90', label: 'Disciplina', higherIsBetter: false, toDisplay: formatDecimal },
+]
+
+const barMetricDefinitions: MetricDefinition[] = [
+  { key: 'matchesPlayed', label: 'Partidos', toDisplay: formatInteger },
+  { key: 'goals', label: 'Goles', toDisplay: formatInteger },
+  { key: 'assists', label: 'Asistencias', toDisplay: formatInteger },
+  { key: 'gaPer90', label: 'G+A/90', toDisplay: formatDecimal },
 ]
 
 export const parseIdsParam = (value: string | null) =>
@@ -220,9 +227,26 @@ export const buildCompareViewModel = (selectedIds: string[], data: PlayerCompari
     }),
   }))
 
+  const barData: CompareBarDatum[] = barMetricDefinitions.map((metric) => {
+    const values = playerStats.map((item) => item.metrics[metric.key] ?? 0)
+
+    return playerStats.reduce<CompareBarDatum>(
+      (accumulator, player) => ({
+        ...accumulator,
+        [player.series.id]: normalizeMetricValue(
+          player.metrics[metric.key] ?? 0,
+          values,
+          metric.higherIsBetter ?? true,
+        ),
+      }),
+      { metric: metric.label },
+    )
+  })
+
   return {
     playerStats,
     radarData,
     metricRows,
+    barData,
   }
 }
