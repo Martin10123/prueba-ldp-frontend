@@ -181,7 +181,17 @@ export const PlayerProfile = () => {
                   </h1>
 
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-white/65 md:text-[15px]">
-                    {player.currentTeamName ?? 'Sin equipo'} ·{' '}
+                    <span className="inline-flex items-center gap-2 align-middle">
+                      {player.currentTeamLogoUrl ? (
+                        <img
+                          src={player.currentTeamLogoUrl}
+                          alt={player.currentTeamName ?? 'Equipo'}
+                          className="h-5 w-5 rounded-full object-cover"
+                        />
+                      ) : null}
+                      {player.currentTeamName ?? 'Sin equipo'}
+                    </span>{' '}
+                    ·{' '}
                     {player.isActive ? 'Profesional activo' : 'Jugador inactivo'} · ID {player.id}
                   </p>
 
@@ -200,9 +210,18 @@ export const PlayerProfile = () => {
 
             <aside className="rounded-[28px] border border-white/10 bg-black/25 p-4 backdrop-blur-sm">
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-bold text-white">{player.currentTeamName ?? 'Sin equipo'}</p>
-                  <p className="mt-1 text-sm text-white/60">{activeSeason?.name ?? 'Temporada actual'}</p>
+                <div className="flex items-center gap-2">
+                  {player.currentTeamLogoUrl ? (
+                    <img
+                      src={player.currentTeamLogoUrl}
+                      alt={player.currentTeamName ?? 'Equipo'}
+                      className="size-12 rounded-full border border-white/10 object-contain"
+                    />
+                  ) : null}
+                  <div>
+                    <p className="text-sm font-bold text-white">{player.currentTeamName ?? 'Sin equipo'}</p>
+                    <p className="mt-1 text-sm text-white/60">{activeSeason?.name ?? 'Temporada actual'}</p>
+                  </div>
                 </div>
                 <div className="rounded-full border border-[#00E094]/30 bg-[#00E094]/15 px-3 py-1 text-sm font-semibold text-[#00E094]">
                   Active
@@ -278,7 +297,16 @@ export const PlayerProfile = () => {
               <div className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div>
                   <p className="text-sm text-white/55">Club</p>
-                  <p className="mt-1 text-base font-semibold text-white">{player.currentTeamName ?? 'Sin equipo'}</p>
+                  <p className="mt-1 inline-flex items-center gap-2 text-base font-semibold text-white">
+                    {player.currentTeamLogoUrl ? (
+                      <img
+                        src={player.currentTeamLogoUrl}
+                        alt={player.currentTeamName ?? 'Equipo'}
+                        className="h-5 w-5 rounded-full object-cover"
+                      />
+                    ) : null}
+                    {player.currentTeamName ?? 'Sin equipo'}
+                  </p>
                 </div>
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-white/5 text-white/75">
                   <Shirt size={18} />

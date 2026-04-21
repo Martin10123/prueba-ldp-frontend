@@ -46,6 +46,7 @@ export type PlayerListItem = {
   photoUrl: string
   currentTeamId?: string
   currentTeamName: string
+  currentTeamLogoUrl?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -59,6 +60,7 @@ export type PlayerDetail = {
   photoUrl: string
   currentTeamId: string | null
   currentTeamName: string | null
+  currentTeamLogoUrl?: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -134,6 +136,7 @@ export type PlayerComparisonItem = {
   photoUrl: string
   currentTeamId: string | null
   currentTeamName: string | null
+  currentTeamLogoUrl?: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
