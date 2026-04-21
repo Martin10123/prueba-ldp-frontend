@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { ComparePlayerComputed } from '../../types/typesCompare'
 import { formatInteger } from '../../helpers/compare'
 
@@ -5,10 +6,46 @@ type ComparePlayerHighlightsProps = {
   players: ComparePlayerComputed[]
 }
 
-export const ComparePlayerHighlights = ({ players }: ComparePlayerHighlightsProps) => (
-  <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-    {players.map((item) => (
-      <article key={item.series.id} className="rounded-2xl border border-white/10 bg-[#171717] p-4">
+export const ComparePlayerHighlights = ({ players }: ComparePlayerHighlightsProps) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: 'easeOut' as const,
+      },
+    },
+  }
+
+  return (
+    <motion.section
+      className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {players.map((item) => (
+        <motion.article
+          key={item.series.id}
+          className="rounded-2xl border border-white/10 bg-[#171717] p-4"
+          variants={itemVariants}
+          whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(0, 224, 148, 0.1)' }}
+          transition={{ duration: 0.2 }}
+        >
         <div className="flex items-center gap-3">
           <div className="h-14 w-14 overflow-hidden rounded-2xl border border-white/15 bg-[#1f1f1f]">
             {item.series.photoUrl ? (
@@ -42,7 +79,8 @@ export const ComparePlayerHighlights = ({ players }: ComparePlayerHighlightsProp
             <p className="mt-1 font-bold text-white">{formatInteger(item.metrics.assists)}</p>
           </div>
         </div>
-      </article>
-    ))}
-  </section>
-)
+        </motion.article>
+      ))}
+    </motion.section>
+  )
+}

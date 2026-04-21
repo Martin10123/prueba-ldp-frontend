@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { motion } from 'framer-motion'
 import type { CompareBarDatum, CompareSeriesPlayer } from '../../types/typesCompare'
 
 type CompareBarChartCardProps = {
@@ -16,7 +17,13 @@ type CompareBarChartCardProps = {
 }
 
 export const CompareBarChartCard = ({ barData, players }: CompareBarChartCardProps) => (
-  <article className="rounded-2xl border border-white/10 bg-[#111111] p-3">
+  <motion.article
+    className="rounded-2xl border border-white/10 bg-[#111111] p-3"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+    whileHover={{ borderColor: 'rgba(0, 224, 148, 0.2)' }}
+  >
     <div className="mb-2 px-1">
       <h3 className="text-lg font-bold">Barras comparativas</h3>
       <p className="text-sm text-white/55">Comparación por métrica en escala normalizada de 0 a 100.</p>
@@ -54,5 +61,5 @@ export const CompareBarChartCard = ({ barData, players }: CompareBarChartCardPro
         </BarChart>
       </ResponsiveContainer>
     </div>
-  </article>
+        </motion.article>
 )

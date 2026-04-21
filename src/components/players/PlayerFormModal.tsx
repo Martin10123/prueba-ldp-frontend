@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Loader2, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { CreatePlayerInput, PlayerListItem, PlayerOptions, UpdatePlayerInput } from '../../types/player'
 import { getPositionLabel } from '../../utils/playerPosition'
 
@@ -78,8 +79,6 @@ export const PlayerFormModal = ({
         })
     }, [form, mode, open, options.nationalities, options.positions, options.teams, player])
 
-    if (!open) return null
-
     const submit = form.handleSubmit(async (values) => {
         const basePayload = {
             name: values.name.trim(),
@@ -106,8 +105,22 @@ export const PlayerFormModal = ({
     })
 
     return (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
-            <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#111111] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+        <AnimatePresence>
+            {open && (
+                <motion.div
+                    className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <motion.div
+                        className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#111111] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                    >
                 <div className="mb-4 flex items-start justify-between gap-3">
                     <div>
                         <h3 className="text-xl font-bold">{mode === 'create' ? 'Crear jugador' : 'Editar jugador'}</h3>
@@ -228,8 +241,10 @@ export const PlayerFormModal = ({
                             {mode === 'create' ? 'Crear' : 'Guardar'}
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                    </form>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     )
 }

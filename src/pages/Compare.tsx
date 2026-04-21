@@ -1,4 +1,5 @@
 import { Loader2, Users } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { CompareMetricsTable } from '../components/compare/CompareMetricsTable'
 import { CompareBarChartCard } from '../components/compare/CompareBarChartCard'
 import { ComparePlayerHighlights } from '../components/compare/ComparePlayerHighlights'
@@ -26,8 +27,18 @@ export const Compare = () => {
   )
 
   return (
-    <section className="space-y-4">
-      <article className={panelClass}>
+    <motion.section
+      className="space-y-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <motion.article
+        className={panelClass}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/10 pb-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-white/45">Comparador API</p>
@@ -55,10 +66,15 @@ export const Compare = () => {
             />
           )}
         </div>
-      </article>
+      </motion.article>
 
       {compareQuery.isError ? (
-        <article className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-100">
+        <motion.article
+          className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-100"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           No se pudo obtener la comparación de jugadores.
           <button
             type="button"
@@ -67,16 +83,26 @@ export const Compare = () => {
           >
             Reintentar
           </button>
-        </article>
+        </motion.article>
       ) : null}
 
       {isLoadingCompare ? (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <motion.div
+          className="grid gap-4 xl:grid-cols-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="h-100 animate-pulse rounded-2xl border border-white/10 bg-[#171717]" />
           <div className="h-100 animate-pulse rounded-2xl border border-white/10 bg-[#171717]" />
-        </div>
+        </motion.div>
       ) : playerStats.length < 2 ? (
-        <article className={panelClass}>
+        <motion.article
+          className={panelClass}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="grid place-items-center rounded-2xl border border-dashed border-white/10 bg-white/5 px-6 py-14 text-center text-sm text-white/60">
             <div>
               <Users size={20} className="mx-auto text-white/55" />
@@ -84,9 +110,13 @@ export const Compare = () => {
               <p className="mt-1">Necesitas 2 o 3 jugadores para generar la comparación.</p>
             </div>
           </div>
-        </article>
+        </motion.article>
       ) : (
-        <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, staggerChildren: 0.1 }}
+        >
           <ComparePlayerHighlights players={playerStats} />
 
           <section className="grid gap-4 xl:grid-cols-2">
@@ -100,14 +130,12 @@ export const Compare = () => {
             />
           </section>
 
-          <section>
-            <CompareMetricsTable
-              players={playerStats.map((item) => item.series)}
-              rows={metricRows}
-            />
-          </section>
-        </>
+          <CompareMetricsTable
+            players={playerStats.map((item) => item.series)}
+            rows={metricRows}
+          />
+        </motion.div>
       )}
-    </section>
+    </motion.section>
   )
 }
